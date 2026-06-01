@@ -8,6 +8,7 @@ export default function Register() {
   const [confirm, setConfirm] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [sent, setSent] = useState(false)
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,14 +27,39 @@ export default function Register() {
     setLoading(true)
     setError('')
 
-    const { error } = await supabase.auth.signUp({ email, password })
+    const { data, error } = await supabase.auth.signUp({ email, password })
 
     if (error) {
       setError(error.message)
       setLoading(false)
-    } else {
+    } else if (data.session) {
       navigate('/')
+    } else {
+      setSent(true)
+      setLoading(false)
     }
+  }
+
+  if (sent) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="w-full max-w-sm text-center">
+          <h1 className="text-3xl font-bold text-green-600 mb-4">HabitFlow</h1>
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+            <div className="text-4xl mb-4">📬</div>
+            <h2 className="text-lg font-semibold mb-2">Revisá tu email</h2>
+            <p className="text-sm text-gray-500">
+              Te enviamos un link de confirmación a <strong>{email}</strong>. Hacé clic en el link para activar tu cuenta e iniciar sesión.
+            </p>
+          </div>
+          <p className="text-center text-sm text-gray-500 mt-4">
+            <Link to="/login" className="text-green-600 hover:underline font-medium">
+              Volver al login
+            </Link>
+          </p>
+        </div>
+      </div>
+    )
   }
 
   return (
