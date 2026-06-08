@@ -3,3 +3,12 @@ dist
 .env
 .env.local
 .DS_Store
+
+# Tests E2E (Playwright)
+/test-results
+/playwright-report
+/blob-report
+/playwright/.cache
+
+# Vercel
+.vercel
