@@ -32,7 +32,7 @@ export default function HabitForm({ initial, onSubmit, onCancel }: Props) {
     setError('')
     try {
       await onSubmit({ name: name.trim(), description: description.trim() || null, color })
-    } catch (err) {
+    } catch {
       setError('Ocurrió un error. Intentá de nuevo.')
     } finally {
       setLoading(false)
