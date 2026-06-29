@@ -89,7 +89,7 @@ Cada cambio se valida automáticamente con un pipeline de GitHub Actions
 producción solo ocurre si todos los pasos anteriores pasan. Las decisiones de calidad están
 documentadas en [`CALIDAD.md`](CALIDAD.md).
 
-**URL de producción:** _(completar con la URL de Vercel)_
+**URL de producción:** https://habitflow-ten-gamma.vercel.app
 
 ### Tests
 
