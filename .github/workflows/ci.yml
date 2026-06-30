@@ -1,0 +1,56 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # 1. Lint: errores estaticos y de estilo. Si falla, se corta el pipeline.
+      - name: Lint
+        run: npm run lint
+
+      # 2. Tests unitarios: logica de negocio de las estadisticas (rachas y porcentajes).
+      - name: Unit tests
+        run: npm test
+
+      # 3. Tests E2E: el flujo de proteccion de rutas (no autenticado -> login) en un navegador real.
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E tests
+        run: npm run test:e2e
+
+      # 4. Build de produccion. Solo se llega aca si lint y tests pasaron.
+      - name: Build
+        run: npm run build
+
+      # 5. Deploy a Vercel. Solo en push a main (no en PRs), solo si todo lo anterior paso
+      #    y solo si estan configurados los secrets de Vercel (si no, se omite sin fallar).
+      - name: Deploy to Vercel (produccion)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && env.VERCEL_TOKEN != ''
+        run: |
+          npm i -g vercel@latest
+          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          vercel build --prod --token="$VERCEL_TOKEN"
+          vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
