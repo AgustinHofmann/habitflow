@@ -2,21 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import type { Habit } from '../types'
-
-const DAYS_ES = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
-
-function getLast7Days(): string[] {
-  return Array.from({ length: 7 }, (_, i) => {
-    const d = new Date()
-    d.setDate(d.getDate() - (6 - i))
-    return d.toISOString().split('T')[0]
-  })
-}
-
-function getDayLabel(dateStr: string): string {
-  const d = new Date(dateStr + 'T12:00:00')
-  return DAYS_ES[d.getDay()]
-}
+import { getLast7Days, getDayLabel, currentStreak, completionRate } from '../lib/stats'
 
 interface HabitStat {
   habit: Habit
@@ -72,20 +58,8 @@ export default function Stats() {
         completions.filter(c => c.habit_id === habit.id).map(c => c.completed_date)
       )
 
-      // Racha: días consecutivos hacia atrás desde hoy
-      let streak = 0
-      const today = new Date()
-      for (let i = 0; i < 30; i++) {
-        const d = new Date(today)
-        d.setDate(d.getDate() - i)
-        const key = d.toISOString().split('T')[0]
-        if (completedDays.has(key)) streak++
-        else break
-      }
-
-      const rate = last7.length > 0
-        ? Math.round((completedDays.size / last7.length) * 100)
-        : 0
+      const streak = currentStreak(completedDays)
+      const rate = completionRate(completedDays.size, last7.length)
 
       return { habit, completedDays, streak, rate }
     })
