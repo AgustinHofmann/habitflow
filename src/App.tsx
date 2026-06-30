@@ -5,6 +5,7 @@ import Navbar from './components/Navbar'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
+import Stats from './pages/Stats'
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -28,6 +29,16 @@ export default function App() {
               <ProtectedRoute>
                 <Layout>
                   <Dashboard />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/stats"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Stats />
                 </Layout>
               </ProtectedRoute>
             }
