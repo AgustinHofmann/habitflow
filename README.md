@@ -81,9 +81,34 @@ npm run dev
 - Barra de progreso diario
 - Cierre de sesión
 
-## Ramas
+## Calidad y CI/CD
 
-- `main` — versión estable y deployada
-- `develop` — rama de integración
-- `agustin` — rama de desarrollo de Agustín Hofmann
-- `aaron` — rama de desarrollo de Aaron Wuler
+Cada cambio se valida automáticamente con un pipeline de GitHub Actions
+([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) que en cada push y pull request a
+`main` ejecuta: **lint → tests unitarios → tests E2E → build → deploy a Vercel**. El deploy a
+producción solo ocurre si todos los pasos anteriores pasan. Las decisiones de calidad están
+documentadas en [`CALIDAD.md`](CALIDAD.md).
+
+**URL de producción:** _(completar con la URL de Vercel)_
+
+### Tests
+
+```bash
+npm test          # tests unitarios (Vitest) — lógica de estadísticas (rachas y %)
+npm run test:e2e  # test E2E (Playwright) — protección de rutas (no autenticado → login)
+npm run lint      # linter (oxlint)
+```
+
+La primera vez, para el E2E: `npx playwright install chromium`.
+
+## Flujo de trabajo y ramas
+
+Ningún cambio se mergea directo a `main`: todo entra por un Pull Request que referencia su issue
+(`closes #N`) y es revisado y aprobado por el otro integrante antes de mergear.
+
+| Prefijo | Para qué | Ejemplo |
+|---|---|---|
+| `feature/` | nueva funcionalidad | `feature/ci-cd-y-tests` |
+| `fix/` | corrección de un bug | `fix/racha-zona-horaria` |
+| `chore/` | mantenimiento / configuración | `chore/configurar-actions` |
+| `docs/` | documentación | `docs/calidad-md` |
